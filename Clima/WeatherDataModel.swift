@@ -11,14 +11,14 @@ import UIKit
 class WeatherDataModel {
 
     //Declare your model variables here
-    var longitude = ""        // -0.13
-    var latitude = ""         // 51.51
+    var longitude = 0.0        // -0.13
+    var latitude = 0.0         // 51.51
     var temperature = 0       //
-    var pressure = 0          // hPa at sea level
-    var humidity = 0.0        // 74
+    var pressure = 0.0        // hPa at sea level
+    var humidity = 0          // 74
     var tempMin = 0           // 275.15   This represents current deviation within area of readings
     var tempMax = 0           // 277.15   This represents current deviation within area of readings
-    var visibility = 0        // 10000
+    var visibility = 0.0      // 10000
     var windSpeed = 0.0       // 4.6
     var windDirection = 0     // 250
     var clouds = ""           // 0  cloud % 
@@ -35,8 +35,34 @@ class WeatherDataModel {
     var subDescription = ""   // clear sky
     
     
-    //This method turns a condition code into the name of the weather condition image
+    // This method turns the wind direction degrees in symbol
+    func windDirection(degrees: Int) -> String {
+        
+        switch (degrees) {
+
+        case 0...11 : return "N"
+        case 348...360 : return "N"
+        case 12...34 : return "NNE"
+        case 35...56 : return "NE"
+        case 57...78 : return "ENE"
+        case 79...101 : return "E"
+        case 102...123 : return "ESE"
+        case 124...146 : return "SE"
+        case 147...168 : return "SSE"
+        case 169...191 : return "S"
+        case 192...213 : return "SSW"
+        case 214...236 : return "SW"
+        case 237...258 : return "WSW"
+        case 259...281 : return "W"
+        case 282...303 : return "WNW"
+        case 304...326 : return "NW"
+        case 327...347 : return "NNW"
+            
+        default : return "-"
+        }
+    }
     
+    //This method turns a condition code into the name of the weather condition image
     func updateWeatherIcon(condition: Int) -> String {
         
     switch (condition) {
@@ -56,7 +82,7 @@ class WeatherDataModel {
         case 701...771 :
             return "fog"
         
-        case 772...800 :
+        case 772...799 :
             return "tstorm3"
         
         case 800 :
@@ -79,7 +105,27 @@ class WeatherDataModel {
         }
 
     }
+ 
+    func getCountryName(code : String) -> String {
+        let countries = [
+            "AU" : "Australia",
+            "GB" : "Britain",
+            "BR" : "Brazil",
+            "CA" : "Canada",
+            "FR" : "France",
+            "DE" : "Germany",
+            "CL" : "Chile",
+            "NL" : "Netherlands",
+            "BE" : "Begium",
+            "US" : "United States",
+            "NZ" : "New Zealand"
+        ]
+        
+        return countries[code]  ?? code
+    }
 }
+
+
 
 // This is the JSON data for Pine Bush,US
 

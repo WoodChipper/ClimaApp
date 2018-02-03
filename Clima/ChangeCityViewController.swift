@@ -43,4 +43,68 @@ class ChangeCityViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
+    // Testing buttons with fixed favorites
+    
+    @IBAction func PineBushUSButtonPushed(_ sender: UIButton) {
+        
+        let cityName = "Pine Bush,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func SonomaButtonPushed(_ sender: UIButton) {
+        let cityName = "Sonoma,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    @IBAction func PineBushButtonPushed(_ sender: UIButton) {
+        let cityName = "Anchorage,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    @IBAction func London(_ sender: UIButton) {
+        let cityName = "London,GB"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func NewYorkButtonPressed(_ sender: UIButton) {
+        let cityName = "New York,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func SanClementeButtonPressed(_ sender: UIButton) {
+        let cityName = "San Clemente,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
+    @IBAction func MelborneButtonPressed(_ sender: UIButton) {
+        let cityName = "Sabina,US"
+        
+        delegate?.userEnteredANewCityName(city: cityName)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
+    
 }

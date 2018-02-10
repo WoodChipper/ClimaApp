@@ -11,7 +11,8 @@ import CoreLocation
 import Alamofire
 import SwiftyJSON
 
-class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate, CitySelectorDelegate {
+    
     
     @IBOutlet weak var faren: UISwitch!
     //Constants
@@ -24,13 +25,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     // complete URL for testing:  "api.openweathermap.org/data/2.5/forecast?id=524901&APPID=1111111111"
     // http://api.openweathermap.org/data/2.5/weather?q=London,UK&APPID=e6c49a8257af1f11fc21c0915ffeff43
-    
+    //  THIS LINE PRINTS ALL TIMEZONE CODES USED IN SWIFT:
+    //  print(TimeZone.abbreviationDictionary)
     
 
     
     //TODO: Declare instance variables here
     let locationManager = CLLocationManager()
     let weatherDataModel = WeatherDataModel()
+    var locationDataModel = LocationDataModel()
+    var selectedCityName: String?
+    var selectedCityLonLat: String?
+    var isSelectedCity = false
  
     
     
@@ -54,6 +60,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet var countryLabel: UILabel!
     @IBOutlet var longitudeLatitudeLabel: UILabel!
     @IBOutlet var fahrOrCelsiusSwitch: UISwitch!
+    @IBOutlet weak var citySelectedName: UILabel!
+    @IBOutlet weak var longLatOfSelectedCity: UILabel!
     
     
     
@@ -67,11 +75,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
+        citySelectedName.isHidden = true
+        longLatOfSelectedCity.isHidden = true
     }
-       
     
-    
-    
+
     
     
     //MARK: - Networking
@@ -87,11 +95,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             response in
             if response.result.isSuccess {
                 
-                print("Success! Got the weather data")
-                let weatherJSON : JSON = JSON(response.result.value!)
+            //    print("Success! Got the weather data")
+            //    let weatherJSON : JSON = JSON(response.result.value!)
                 
                 
-                print(weatherJSON)
+             //   print(weatherJSON)
                 
                 self.weatherJSON = JSON(response.result.value!)
                 self.updateWeatherData(json: self.weatherJSON)
@@ -110,7 +118,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
   
     //Write the updateWeatherData method here:
     
-    
     func updateWeatherData(json : JSON) {
     
         if let tempResult = json["main"]["temp"].double {
@@ -118,11 +125,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             if fahrOrCelsiusSwitch.isOn {
                 // Fahrenheit conversion - ° F = 9/5(K - 273) + 32
                 weatherDataModel.temperature = Int(((tempResult - 273.15) * (9 / 5)) + 32)
-                FahrenheitCelsiusSwitchLabel.text = "Fahrenheit"
+                FahrenheitCelsiusSwitchLabel.text = "F"
             } else {
                 // Celcius conversion
                 weatherDataModel.temperature = Int(tempResult - 273.15)
-                FahrenheitCelsiusSwitchLabel.text = "Celsius"
+                FahrenheitCelsiusSwitchLabel.text = "C"
             }
     
             weatherDataModel.tempMax = Int(json["main"]["temp_max"].doubleValue)
@@ -150,15 +157,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
     
             let formatter = DateFormatter()
+            let tempReadingTime = json["dt"].doubleValue
+            formatter.dateFormat = "EEEE,  MMM d, yyyy  h:mm a"
+            weatherDataModel.timeOfReading = formatter.string(from: Date(timeIntervalSince1970: tempReadingTime))
+            
+            // Now change formatter to UTC time zone.
             formatter.dateFormat = "h:mm a"
+            formatter.timeZone = TimeZone(identifier: String(describing: locationDataModel.timeZone))
             let tempSunrise = json["sys"]["sunrise"].doubleValue
             weatherDataModel.sunrise = formatter.string(from: Date(timeIntervalSince1970: tempSunrise))
             let tempSunset = json["sys"]["sunset"].doubleValue
             weatherDataModel.sunset = formatter.string(from: Date(timeIntervalSince1970: tempSunset))
-            let tempReadingTime = json["dt"].doubleValue
-            formatter.dateFormat = "EEEE,  MMM d, yyyy  h:mm a"
-            weatherDataModel.timeOfReading = formatter.string(from: Date(timeIntervalSince1970: tempReadingTime))
-    
+//            print("sunset: \(tempSunset) TimeZone: \(locationDataModel.timeZone)")
             updateUIWithWeatherData()
     
         } else {
@@ -166,12 +176,21 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         }
     }
 
-    
-    
-    
+//    //**********************************
+//    // DATE formatter
+//    func convertUTCToUTC(dateToConvert:String) -> String {
+//
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "dd-MM-yyyy hh:mm a"
+//        formatter.timeZone = TimeZone(identifier: "UTC")
+//
+//        let convertedDate = formatter.date(from: dateToConvert)
+//        formatter.timeZone = TimeZone(identifier: "UTC")
+//        return formatter.string(from: convertedDate!)
+//
+//    }
     //MARK: - UI Updates
     /***************************************************************/
-    
     
     //Write the updateUIWithWeatherData method here:
     
@@ -209,13 +228,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         // Visiblity is not well supported from OpenWeatherMap at this time. Not worth the trouble
         // visibilityLabel.text = "\(Int(weatherDataModel.visibility * METERS_TO_MILES))  miles"
         
-        
-        
-        
-        
     }
-    
-    
     
     
     //MARK: - Location Manager Delegate Methods
@@ -229,7 +242,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             
             locationManager.stopUpdatingLocation()
             
-            print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
+           // print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
             
             let latitude = String(location.coordinate.latitude)
             let longitude = String(location.coordinate.longitude)
@@ -254,17 +267,47 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     /***************************************************************/
     
     
-    //Write the userEnteredANewCityName Delegate method here:
+    // Favorites: userEnteredANewCityName Delegate method here:
     
-    
-    func userEnteredANewCityName(city: String) {
+    func userEnteredANewCityName(favCity: LocationDataModel) {
         
-        let params : [String : String] = ["q" : city, "appid" : APP_ID]
+        citySelectedName.isHidden = true
+        longLatOfSelectedCity.isHidden = true
+        isSelectedCity = false
+        
+        let params : [String : String] = ["lat" : favCity.latitude, "lon" : favCity.longitude, "appid" : APP_ID]
         
         getWeatherData(url: WEATHER_URL, parameters: params)
         
     }
 
+    // selected City delegate received
+    
+    func userSelectedNewCity(newCityData: LocationDataModel) {
+        
+        citySelectedName.isHidden = false
+        longLatOfSelectedCity.isHidden = false
+        isSelectedCity = true
+        locationDataModel = newCityData
+        
+
+        citySelectedName.text = newCityData.cityName
+        longLatOfSelectedCity.text = getLonLatString(longitude: newCityData.longitude, latitude: newCityData.latitude)
+
+        let params : [String : String] = ["lat" : newCityData.latitude, "lon" : newCityData.longitude, "appid" : APP_ID]
+        
+        getWeatherData(url: WEATHER_URL, parameters: params)
+
+    }
+    
+    func getLonLatString(longitude: String, latitude: String) -> String {
+        
+        // format Longitude and Latitude to 3 decimal places
+        let lon = String(format: "%.3f", Double(longitude)!)
+        let lat = String(format: "%.3f", Double(latitude)!)
+        return "Lon: \(lon)  Lat: \(lat)"
+        
+    }
     
     //Write the PrepareForSegue Method here
     
@@ -275,10 +318,14 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             
             let destinationVC = segue.destination as! ChangeCityViewController
             
-            
             destinationVC.delegate = self
             
         }
+        if segue.identifier == "CitySelectorSegue" {
+            let destinationVC = segue.destination as! CitySelectorController
+            destinationVC.delegate = self
+        }
+        
         
     }
  
@@ -288,7 +335,12 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
     
     @IBAction func refreshButtonPressed(_ sender: UIButton) {
-               userEnteredANewCityName(city: cityLabel.text!)
+
+//        let currentCity = weatherDataModel.city + "," + weatherDataModel.country
+//
+//        userEnteredANewCityName(city: currentCity)
+        
+//        userSelectedNewCity(longitude: String, latitude: String)(latitude: "51.509", longitude: "-0.13")
     }
     
 }

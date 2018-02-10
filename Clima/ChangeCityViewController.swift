@@ -11,97 +11,119 @@ import UIKit
 
 //Write the protocol declaration here:
 protocol ChangeCityDelegate {
-    func userEnteredANewCityName(city: String)
+    func userEnteredANewCityName(favCity: LocationDataModel)
 }
 
 
 class ChangeCityViewController: UIViewController {
     
     var delegate : ChangeCityDelegate?
+    var favoriteCity = LocationDataModel()
     
     //This is the pre-linked IBOutlets to the text field:
     @IBOutlet weak var changeCityTextField: UITextField!
 
-    
-    //This is the IBAction that gets called when the user taps on the "Get Weather" button:
-    
-    
-    @IBAction func getWeatherPressed(_ sender: AnyObject) {
-
-        let cityName = changeCityTextField.text!
-        
-        delegate?.userEnteredANewCityName(city: cityName)
-
-        self.dismiss(animated: true, completion: nil)
-        
-    }
-    
-    
 
     //This is the IBAction that gets called when the user taps the back button. It dismisses the ChangeCityViewController.
     @IBAction func backButtonPressed(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
     
+    
+    //********************************************************************
     // Testing buttons with fixed favorites
     
     @IBAction func PineBushUSButtonPushed(_ sender: UIButton) {
         
-        let cityName = "Pine Bush,US"
+        favoriteCity.cityName = "Pine Bush"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/New_York"
+        favoriteCity.longitude = "-74.2990401"
+        favoriteCity.latitude = "41.6081492"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     
     @IBAction func SonomaButtonPushed(_ sender: UIButton) {
-        let cityName = "Sonoma,US"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        favoriteCity.cityName = "Sonoma"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/Los_Angels"
+        favoriteCity.longitude = "-122.458036"
+        favoriteCity.latitude = "38.291859"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     @IBAction func PineBushButtonPushed(_ sender: UIButton) {
-        let cityName = "Anchorage,US"
+
+        favoriteCity.cityName = "Anchorage"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/Juneau"
+        favoriteCity.longitude = "-149.900278"
+        favoriteCity.latitude = "61.218056"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     @IBAction func London(_ sender: UIButton) {
-        let cityName = "London,GB"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        favoriteCity.cityName = "London"
+        favoriteCity.countryCode = "GB"
+        favoriteCity.timeZone = "European/Lisbon"
+        favoriteCity.longitude = "-0.127758"
+        favoriteCity.latitude = "51.507351"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     
     @IBAction func NewYorkButtonPressed(_ sender: UIButton) {
-        let cityName = "New York,US"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        favoriteCity.cityName = "New York"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/New_York"
+        favoriteCity.longitude = "-74.005973"
+        favoriteCity.latitude = "40.712775"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     
     @IBAction func SanClementeButtonPressed(_ sender: UIButton) {
-        let cityName = "San Clemente,US"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        favoriteCity.cityName = "San Clemente"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/Los_Angles"
+        favoriteCity.longitude = "-117.612600"
+        favoriteCity.latitude = "33.427352"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         
     }
     
     @IBAction func MelborneButtonPressed(_ sender: UIButton) {
-        let cityName = "Sabina,US"
         
-        delegate?.userEnteredANewCityName(city: cityName)
+        favoriteCity.cityName = "Sabina"
+        favoriteCity.countryCode = "US"
+        favoriteCity.timeZone = "America/New_York"
+        favoriteCity.longitude = "-83.636866"
+        favoriteCity.latitude = "39.488673"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
         
         self.dismiss(animated: true, completion: nil)
         

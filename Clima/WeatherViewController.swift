@@ -11,7 +11,10 @@ import CoreLocation
 import Alamofire
 import SwiftyJSON
 
-class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate, CitySelectorDelegate {
+
+
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate, CitySelectorDelegate, ForParsedWeatherDelegate {
+
     
     
     @IBOutlet weak var faren: UISwitch!
@@ -32,15 +35,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //TODO: Declare instance variables here
     let locationManager = CLLocationManager()
-    let weatherDataModel = WeatherDataModel()
+    var weatherDataModel = WeatherDataModel()
     var locationDataModel = LocationDataModel()
+    var parseWeatherDataJSON = ParseWeatherDataJSON()
     var selectedCityName: String?
     var selectedCityLonLat: String?
     var isSelectedCity = false
+
  
     
     
-    //Pre-linked IBOutlets
+    
+    // IBOutlets
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -69,7 +75,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         super.viewDidLoad()
     
        
-        //TODO:Set up the location manager here.
+        // Set up the location manager here.
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestWhenInUseAuthorization()
@@ -95,21 +101,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             response in
             if response.result.isSuccess {
                 
-            //    print("Success! Got the weather data")
-            //    let weatherJSON : JSON = JSON(response.result.value!)
-                
-                
-             //   print(weatherJSON)
-                
                 self.weatherJSON = JSON(response.result.value!)
-                self.updateWeatherData(json: self.weatherJSON)
-            }
-            else {
+                
+                self.parseWeatherDataJSON.updateWeatherData(json: self.weatherJSON, timeZone : self.locationDataModel.timeZone)
+
+                self.updateUIWithWeatherData()
+            //   print(weatherJSON)
+                
+            } else {
                 print("Error \(String(describing: response.result.error))")
                 self.cityLabel.text = "Connection Issues"
             }
         }
-        
     }
     
     
@@ -118,63 +121,63 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
   
     //Write the updateWeatherData method here:
     
-    func updateWeatherData(json : JSON) {
-    
-        if let tempResult = json["main"]["temp"].double {
-            
-            if fahrOrCelsiusSwitch.isOn {
-                // Fahrenheit conversion - ° F = 9/5(K - 273) + 32
-                weatherDataModel.temperature = Int(((tempResult - 273.15) * (9 / 5)) + 32)
-                FahrenheitCelsiusSwitchLabel.text = "F"
-            } else {
-                // Celcius conversion
-                weatherDataModel.temperature = Int(tempResult - 273.15)
-                FahrenheitCelsiusSwitchLabel.text = "C"
-            }
-    
-            weatherDataModel.tempMax = Int(json["main"]["temp_max"].doubleValue)
-            weatherDataModel.tempMin = Int(json["main"]["temp_min"].doubleValue)
-            weatherDataModel.pressure = json["main"]["pressure"].doubleValue
-            weatherDataModel.humidity = Int(json["main"]["humidity"].doubleValue)
-        
-            // Visiblity is not well supported from OpenWeatherMap at this time. Not worth the trouble
-            // weatherDataModel.visibility = json["visibility"].doubleValue   // meters
-
-            weatherDataModel.windSpeed = json["wind"]["speed"].doubleValue   // meters/second
-            weatherDataModel.windDirection = Int(json["wind"]["deg"].doubleValue)
-            weatherDataModel.clouds = json["clouds"]["all"].stringValue
-        
-            weatherDataModel.city = json["name"].stringValue
-            weatherDataModel.country = json["sys"]["country"].stringValue
-            weatherDataModel.cityID = json["sys"]["id"].stringValue
-            weatherDataModel.longitude = json["coord"]["lon"].doubleValue
-            weatherDataModel.latitude = json["coord"]["lat"].doubleValue
-    
-            weatherDataModel.condition = json["weather"][0]["id"].intValue
-            weatherDataModel.mainDescription = json["weather"][0]["main"].stringValue
-            weatherDataModel.subDescription = json["weather"][0]["description"].stringValue
-        
-            weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
-    
-            let formatter = DateFormatter()
-            let tempReadingTime = json["dt"].doubleValue
-            formatter.dateFormat = "EEEE,  MMM d, yyyy  h:mm a"
-            weatherDataModel.timeOfReading = formatter.string(from: Date(timeIntervalSince1970: tempReadingTime))
-            
-            // Now change formatter to UTC time zone.
-            formatter.dateFormat = "h:mm a"
-            formatter.timeZone = TimeZone(identifier: String(describing: locationDataModel.timeZone))
-            let tempSunrise = json["sys"]["sunrise"].doubleValue
-            weatherDataModel.sunrise = formatter.string(from: Date(timeIntervalSince1970: tempSunrise))
-            let tempSunset = json["sys"]["sunset"].doubleValue
-            weatherDataModel.sunset = formatter.string(from: Date(timeIntervalSince1970: tempSunset))
-//            print("sunset: \(tempSunset) TimeZone: \(locationDataModel.timeZone)")
-            updateUIWithWeatherData()
-    
-        } else {
-            cityLabel.text = "Weather Unavailable"
-        }
-    }
+//    func updateWeatherData(json : JSON) {
+//
+//        if let tempResult = json["main"]["temp"].double {
+//
+//            if fahrOrCelsiusSwitch.isOn {
+//                // Fahrenheit conversion - ° F = 9/5(K - 273) + 32
+//                weatherDataModel.temperature = Int(((tempResult - 273.15) * (9 / 5)) + 32)
+//                FahrenheitCelsiusSwitchLabel.text = "F"
+//            } else {
+//                // Celcius conversion
+//                weatherDataModel.temperature = Int(tempResult - 273.15)
+//                FahrenheitCelsiusSwitchLabel.text = "C"
+//            }
+//
+//            weatherDataModel.tempMax = Int(json["main"]["temp_max"].doubleValue)
+//            weatherDataModel.tempMin = Int(json["main"]["temp_min"].doubleValue)
+//            weatherDataModel.pressure = json["main"]["pressure"].doubleValue
+//            weatherDataModel.humidity = Int(json["main"]["humidity"].doubleValue)
+//
+//            // Visiblity is not well supported from OpenWeatherMap at this time. Not worth the trouble
+//            // weatherDataModel.visibility = json["visibility"].doubleValue   // meters
+//
+//            weatherDataModel.windSpeed = json["wind"]["speed"].doubleValue   // meters/second
+//            weatherDataModel.windDirection = Int(json["wind"]["deg"].doubleValue)
+//            weatherDataModel.clouds = json["clouds"]["all"].stringValue
+//        
+//            weatherDataModel.city = json["name"].stringValue
+//            weatherDataModel.country = json["sys"]["country"].stringValue
+//            weatherDataModel.cityID = json["sys"]["id"].stringValue
+//            weatherDataModel.longitude = json["coord"]["lon"].doubleValue
+//            weatherDataModel.latitude = json["coord"]["lat"].doubleValue
+//
+//            weatherDataModel.condition = json["weather"][0]["id"].intValue
+//            weatherDataModel.mainDescription = json["weather"][0]["main"].stringValue
+//            weatherDataModel.subDescription = json["weather"][0]["description"].stringValue
+//        
+//            weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
+//
+//            let formatter = DateFormatter()
+//            let tempReadingTime = json["dt"].doubleValue
+//            formatter.dateFormat = "EEEE,  MMM d, yyyy  h:mm a"
+//            weatherDataModel.timeOfReading = formatter.string(from: Date(timeIntervalSince1970: tempReadingTime))
+//
+//            // Now change formatter to UTC time zone.
+//            formatter.dateFormat = "h:mm a"
+//            formatter.timeZone = TimeZone(identifier: String(describing: locationDataModel.timeZone))
+//            let tempSunrise = json["sys"]["sunrise"].doubleValue
+//            weatherDataModel.sunrise = formatter.string(from: Date(timeIntervalSince1970: tempSunrise))
+//            let tempSunset = json["sys"]["sunset"].doubleValue
+//            weatherDataModel.sunset = formatter.string(from: Date(timeIntervalSince1970: tempSunset))
+////            print("sunset: \(tempSunset) TimeZone: \(locationDataModel.timeZone)")
+//            updateUIWithWeatherData()
+//
+//        } else {
+//            cityLabel.text = "Weather Unavailable"
+//        }
+//    }
 
 //    //**********************************
 //    // DATE formatter
@@ -197,7 +200,17 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     func updateUIWithWeatherData() {
         
         cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = "\(weatherDataModel.temperature)°"
+        
+        if fahrOrCelsiusSwitch.isOn {
+            // Fahrenheit
+            temperatureLabel.text = "\(weatherDataModel.temperatureFah)°"
+            FahrenheitCelsiusSwitchLabel.text = "F"
+        } else {
+            // Celsius
+            temperatureLabel.text = "\(weatherDataModel.temperatureCel)°"
+            FahrenheitCelsiusSwitchLabel.text = "C"
+        }
+
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
         sunriseLabel.text = weatherDataModel.sunrise
         sunsetLabel.text = weatherDataModel.sunset
@@ -269,6 +282,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     // Favorites: userEnteredANewCityName Delegate method here:
     
+    func weatherUpdate(updateWeather: WeatherDataModel) {
+        weatherDataModel = updateWeather
+    }
+    
+
     func userEnteredANewCityName(favCity: LocationDataModel) {
         
         citySelectedName.isHidden = true
@@ -330,8 +348,16 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
  
     @IBAction func fahrCelsiusSwitch(_ sender: UISwitch) {
- 
-        updateWeatherData(json: weatherJSON)
+
+        if fahrOrCelsiusSwitch.isOn {
+            // Fahrenheit
+            temperatureLabel.text = "\(weatherDataModel.temperatureFah)°"
+            FahrenheitCelsiusSwitchLabel.text = "F"
+        } else {
+            // Celsius
+            temperatureLabel.text = "\(weatherDataModel.temperatureCel)°"
+            FahrenheitCelsiusSwitchLabel.text = "C"
+        }
     }
     
     @IBAction func refreshButtonPressed(_ sender: UIButton) {

@@ -11,9 +11,10 @@ import UIKit
 class WeatherDataModel {
 
     //Declare your model variables here
-    var longitude = 0.0        // -0.13
-    var latitude = 0.0         // 51.51
-    var temperature = 0       //
+    var longitude = 0.0       // -0.13
+    var latitude = 0.0        // 51.51
+    var temperatureFah = 0    //
+    var temperatureCel = 0    //
     var pressure = 0.0        // hPa at sea level
     var humidity = 0          // 74
     var tempMin = 0           // 275.15   This represents current deviation within area of readings

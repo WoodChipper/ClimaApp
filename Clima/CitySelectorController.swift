@@ -18,16 +18,10 @@ class CitySelectorController: UIViewController {
     
     var delegate : CitySelectorDelegate?
     var newCity = LocationDataModel()
-    
-    
-    @IBOutlet weak var searchBar: UISearchBar!
     var searchCompleter = MKLocalSearchCompleter()
     var searchResults = [MKLocalSearchCompletion]()
-    var searchSource: [String]?
-    var cityName = "No Data"
     
-    
-    
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var searchResultsTableView: UITableView!
     
     override func viewDidLoad() {
@@ -110,7 +104,7 @@ extension CitySelectorController: UITableViewDelegate {
 //                print(response?.mapItems[0].name)
 //                print(String(describing: coordinate))
 //                print(response?.mapItems)
-                //print("lon1: \(longitude)")
+//                print("lon1: \(longitude)")
                 
                 self.delegate?.userSelectedNewCity(newCityData : self.newCity)
             

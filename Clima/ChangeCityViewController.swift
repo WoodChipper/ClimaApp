@@ -29,9 +29,7 @@ class ChangeCityViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    
     //********************************************************************
-    // Testing buttons with fixed favorites
     
     @IBAction func PineBushUSButtonPushed(_ sender: UIButton) {
         

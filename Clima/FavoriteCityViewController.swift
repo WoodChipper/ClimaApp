@@ -15,7 +15,7 @@ protocol ChangeCityDelegate {
 }
 
 
-class ChangeCityViewController: UIViewController {
+class FavoriteCityViewController: UIViewController {
     
     var delegate : ChangeCityDelegate?
     var favoriteCity = LocationDataModel()
@@ -49,7 +49,7 @@ class ChangeCityViewController: UIViewController {
         
         favoriteCity.cityName = "Sonoma"
         favoriteCity.countryCode = "US"
-        favoriteCity.timeZone = "America/Los_Angels"
+        favoriteCity.timeZone = "America/Los_Angeles"
         favoriteCity.longitude = "-122.458036"
         favoriteCity.latitude = "38.291859"
         
@@ -75,7 +75,7 @@ class ChangeCityViewController: UIViewController {
         
         favoriteCity.cityName = "London"
         favoriteCity.countryCode = "GB"
-        favoriteCity.timeZone = "European/Lisbon"
+        favoriteCity.timeZone = "UTC"
         favoriteCity.longitude = "-0.127758"
         favoriteCity.latitude = "51.507351"
         
@@ -103,7 +103,7 @@ class ChangeCityViewController: UIViewController {
         
         favoriteCity.cityName = "San Clemente"
         favoriteCity.countryCode = "US"
-        favoriteCity.timeZone = "America/Los_Angles"
+        favoriteCity.timeZone = "America/Los_Angeles"
         favoriteCity.longitude = "-117.612600"
         favoriteCity.latitude = "33.427352"
         

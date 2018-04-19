@@ -127,4 +127,12 @@ class FavoriteCityViewController: UIViewController {
         
     }
     
+    @IBAction func thisLocationButtonPressed(_ sender: UIButton) {
+        favoriteCity.cityName = "ThisLocation"
+        
+        delegate?.userEnteredANewCityName(favCity: self.favoriteCity)
+        
+        self.dismiss(animated: true, completion: nil)
+        
+    }
 }

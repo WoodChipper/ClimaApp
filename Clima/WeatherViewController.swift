@@ -38,6 +38,10 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     var isSelectedCity = false
     var locationTimeZone = ""
     
+    // for testing
+    var testLat = "test Data"
+    var params : [String : String?] = [:]
+    
     // IBOutlets
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
@@ -86,15 +90,22 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     // Favorites: userEnteredANewCityName Delegate method here:
     func userEnteredANewCityName(favCity: LocationDataModel) {
         
-        citySelectedName.isHidden = true
-        longLatOfSelectedCity.isHidden = true
-        isSelectedCity = false
-        locationTimeZone = favCity.timeZone
-        
-        
-        let params : [String : String] = ["lat" : favCity.latitude, "lon" : favCity.longitude, "appid" : APP_ID]
-        
-        getWeatherData(url: WEATHER_URL, parameters: params)
+        if favCity.cityName != "ThisLocation" {
+            citySelectedName.isHidden = true
+            longLatOfSelectedCity.isHidden = true
+            isSelectedCity = false
+            locationTimeZone = favCity.timeZone
+            
+            
+            params = ["lat" : favCity.latitude, "lon" : favCity.longitude, "appid" : APP_ID]
+            
+            getWeatherData(url: WEATHER_URL, parameters: params as! [String : String])
+        } else {
+            locationManager.startUpdatingLocation()
+            
+            citySelectedName.isHidden = true
+            longLatOfSelectedCity.isHidden = true
+        }
         
     }
     
@@ -111,9 +122,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         longLatOfSelectedCity.text = getLonLatString(longitude: newCityData.longitude, latitude: newCityData.latitude)
         
-        let params : [String : String] = ["lat" : newCityData.latitude, "lon" : newCityData.longitude, "appid" : APP_ID]
+        params = ["lat" : newCityData.latitude, "lon" : newCityData.longitude, "appid" : APP_ID]
         
-        getWeatherData(url: WEATHER_URL, parameters: params)
+        getWeatherData(url: WEATHER_URL, parameters: params as! [String : String])
         
     }
     
@@ -265,9 +276,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             let latitude = String(location.coordinate.latitude)
             let longitude = String(location.coordinate.longitude)
             
-            let params : [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID]
+            params = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID]
             
-            getWeatherData(url: WEATHER_URL, parameters: params)
+            getWeatherData(url: WEATHER_URL, parameters: params as! [String : String])
         }
     }
     
@@ -308,6 +319,14 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             let destinationVC = segue.destination as! CitySelectorController
             destinationVC.delegate = self
         }
+        
+        if segue.identifier == "ForecastSegue" {
+            if let destinationVC = segue.destination as? ForecastViewController {
+                
+                destinationVC.location = params //locationDataModel.cityName
+                
+            }
+        }
     }
  
     func displayFahOrCelTemp() {
@@ -321,6 +340,13 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             FahrenheitCelsiusSwitchLabel.text = "C"
         }
     }
+    
+    @IBAction func forecastSegueButtonPressed(_ sender: UIButton) {
+        
+            performSegue(withIdentifier: "ForecastSegue", sender: self)
+    }
+    
+    
     @IBAction func fahrCelsiusSwitch(_ sender: UISwitch) {
 
         displayFahOrCelTemp()
@@ -332,7 +358,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
 //
 //        userEnteredANewCityName(city: currentCity)
         
-//        userSelectedNewCity(longitude: String, latitude: String)(latitude: "51.509", longitude: "-0.13")
+//        userSelectedNewCity(longitude: String, latitude: String)(latitude: weatherDataModel.longitude, longitude: weatherDataModel.latitude)
+        
+        params = ["lat" : String(weatherDataModel.latitude), "lon" : String(weatherDataModel.longitude), "appid" : APP_ID]
+        
+        getWeatherData(url: WEATHER_URL, parameters: params as! [String : String])
     }
     
 }

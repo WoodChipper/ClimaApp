@@ -31,6 +31,9 @@ class CitySelectorController: UIViewController {
         searchCompleter.delegate = self
         searchBar.delegate = self
     }
+    @IBAction func cancelButtonPressed(_ sender: UIButton) {
+            self.dismiss(animated: true, completion: nil)
+    }
     
 }
 

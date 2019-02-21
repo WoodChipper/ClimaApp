@@ -89,7 +89,7 @@ extension CitySelectorController: UITableViewDelegate {
         
         let completion = searchResults[indexPath.row]
         
-        let searchRequest = MKLocalSearchRequest(completion: completion)
+        let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         search.start { (response, error) in
                 let coordinate = response?.mapItems[0].placemark.coordinate

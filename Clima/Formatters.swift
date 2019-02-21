@@ -69,7 +69,7 @@ class Formatters {
 // MARK: Font Extension
 extension NSMutableAttributedString {
     @discardableResult func small(_ text: String) -> NSMutableAttributedString {
-        let attrs: [NSAttributedStringKey: Any] = [.font: UIFont(name: "AvenirNextCondensed-Regular", size: 12)!]
+        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: "AvenirNextCondensed-Regular", size: 12)!]
         let smallString = NSMutableAttributedString(string:text, attributes: attrs)
         append(smallString)
         

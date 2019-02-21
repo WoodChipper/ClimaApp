@@ -253,8 +253,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let pressureString = String(Int(weatherDataModel.pressure)) + " mB"
         let len = pressureString.count
         let attributedPressureString = NSMutableAttributedString(string: pressureString)
-        attributedPressureString.addAttribute(NSAttributedStringKey
-            .font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
+        attributedPressureString.addAttribute(NSAttributedString.Key.font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
                 location: len - 3,
                 length:3))
         pressureLabel.attributedText = attributedPressureString
@@ -264,8 +263,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let inHG = (weatherDataModel.pressure * PRESSURE_IPA_TO_INHG)
         let pressureInchString = String(format: "%.2f", inHG) + " inHG"
         let attributedPressureInchString = NSMutableAttributedString(string: pressureInchString)
-        attributedPressureInchString.addAttribute(NSAttributedStringKey
-            .font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
+        attributedPressureInchString.addAttribute(NSAttributedString.Key.font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
             location:6,
             length:4))
         pressureInchLabel.attributedText = attributedPressureInchString

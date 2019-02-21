@@ -8,61 +8,124 @@
 
 import Foundation
 
-struct ForecastDataModel: Codable {
-    
-    var cod : String?
-    let message : Double
-    let cnt : Int
-    
-    struct List: Codable {
-        
-
- 
-    }
-
-    struct City: Codable {
-        var id : String
-        var name : String
-        var country : String
-        var population : String
-        var lat : String
-        var lon : String
-        
-        enum CodeKeys :  String, CodingKey {
-            case id
-            case name
-            case country
-            case population
-            case coord
-        }
-        
-        enum CoordKey : String, CodingKey {
-            case lat
-            case lon
-        }
-    }
-    
-
-    
-    let city : City
-//    let coord : Coord
-    
+public struct Forecast : Codable {
+    var cod : String
+    var message : Double
+    var cnt : Int
+    var list : [ForecastItem]
+    var city : City
 }
 
-//struct Coord : Codable {
-//    var lat : Double?
-//    var lon : Double?
-//}
-
-//    var name : String
-//    var temperatureFah : Int
-//    var pressure : Int
-//    var humidity : Int
-//    var condition : String
-//    var conditionDescription : String
+public struct ForecastItem : Codable {  // "list"
+    var dt : Int
+    var main : MainData
+    var weather : [Weather]
+    var clouds : Clouds
+    var wind : Wind
+    var rain : Rain?
+    var sys : System
+    var dateText : String
     
-//    enum ForecastDataModel: String, CodingKey {
-//        case country = "country"
-//        case cityName = "name"
-//    }
+    enum CodingKeys: String, CodingKey {
+        case dt
+        case main
+        case weather
+        case clouds
+        case wind
+        case rain
+        case sys
+        case dateText = "dt_txt"
+    }
+}
 
+struct MainData : Codable {
+    var temp : Double
+    var tempMax : Double
+    var tempMin : Double
+    var pressure : Double
+    var seaLevel : Double
+    var grndLevel : Double
+    var humidity : Int
+    var tempKF  : Double
+    
+    enum CodingKeys: String, CodingKey {
+        case temp = "temp"
+        case tempMax = "temp_max"
+        case tempMin = "temp_min"
+        case pressure = "pressure"
+        case seaLevel = "sea_level"
+        case grndLevel = "grnd_level"
+        case humidity = "humidity"
+        case tempKF = "temp_kf"
+    }
+}
+
+public struct Weather : Codable {
+    var id : Int
+    var main : String
+    var description : String
+    var icon : String
+}
+
+public struct Clouds : Codable {
+    var all : Int
+}
+
+public struct Wind : Codable {
+    var speed : Double
+    var deg : Double
+}
+
+public struct Rain : Codable {
+    var threeHour : Double?
+
+    enum CodingKeys: String, CodingKey {
+        case threeHour = "3h"
+    }
+}
+
+public struct System : Codable {
+    var pod : String
+}
+
+public struct City : Codable {
+    var id : Int
+    var name : String
+    var coord : Coordinates
+    var country : String
+    var population : Int
+}
+
+public struct Coordinates : Codable {
+    var lat : Double
+    var lon : Double
+}
+
+public class ForecastDecoder {
+//    /// Decodes the `date (dt) or (dt_txt)` fields in `Forecast` structs.
+//    lazy var dateTimeFormatter: DateFormatter = {
+//        let formatter = DateFormatter.init()
+//        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+//        return formatter
+//    }()
+//
+//    /// Decodes the `date (dt) or (dt_txt)` fields in `FeedItem` structs.
+//    lazy var dateFormatter: DateFormatter = {
+//        let formatter = DateFormatter.init()
+//        formatter.dateFormat = "yyyy-MM-dd"
+//        return formatter
+//    }()
+    
+    /// Decodes a Forecast with embedded `list`s and multiple date formats.
+    lazy var decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+
+        return decoder
+    }()
+    
+    public func decodeFeed(from data: Data) -> Forecast {
+  
+        let forecastData = try! self.decoder.decode(Forecast.self, from: data)
+        return forecastData
+    }
+}

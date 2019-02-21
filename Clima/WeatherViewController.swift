@@ -54,6 +54,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet var sunsetLabel: UILabel!
     @IBOutlet var humidityLabel: UILabel!
     @IBOutlet var pressureLabel: UILabel!
+    @IBOutlet weak var pressureInchLabel: UILabel!
     @IBOutlet var mainDescriptionLabel: UILabel!
     @IBOutlet var windSpeedLabel: UILabel!
     @IBOutlet var windDirectionLabel: UILabel!
@@ -80,6 +81,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         citySelectedName.isHidden = true
         longLatOfSelectedCity.isHidden = true
         
+        
     }
     
     
@@ -95,6 +97,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             longLatOfSelectedCity.isHidden = true
             isSelectedCity = false
             locationTimeZone = favCity.timeZone
+            weatherDataModel.timeZone = favCity.timeZone
             
             
             params = ["lat" : favCity.latitude, "lon" : favCity.longitude, "appid" : APP_ID]
@@ -117,6 +120,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         isSelectedCity = true
         locationDataModel = newCityData
         locationTimeZone = newCityData.timeZone
+        weatherDataModel.timeZone = newCityData.timeZone
         
         citySelectedName.text = newCityData.cityName
         
@@ -146,7 +150,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 
                 self.updateWeatherData(json: self.weatherJSON)
 
-            //   print(weatherJSON)
+//               print(self.weatherJSON)
                 
             } else {
                 print("Error \(String(describing: response.result.error))")
@@ -244,15 +248,28 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let lat = String(format: "%.3f", weatherDataModel.latitude)
         longitudeLatitudeLabel.text = "Lon: \(lon)  Lat: \(lat)"
         
-        // convert pressure from pHa to inHG
-        let inHG = (weatherDataModel.pressure * PRESSURE_IPA_TO_INHG)
-        let pressureString = String(format: "%.2f", inHG) + " inHG"
+        // Set up Attributed String for basic Pressure
+        
+        let pressureString = String(Int(weatherDataModel.pressure)) + " mB"
+        let len = pressureString.count
         let attributedPressureString = NSMutableAttributedString(string: pressureString)
         attributedPressureString.addAttribute(NSAttributedStringKey
             .font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
+                location: len - 3,
+                length:3))
+        pressureLabel.attributedText = attributedPressureString
+        
+        
+        // convert pressure from pHa to inHG
+        let inHG = (weatherDataModel.pressure * PRESSURE_IPA_TO_INHG)
+        let pressureInchString = String(format: "%.2f", inHG) + " inHG"
+        let attributedPressureInchString = NSMutableAttributedString(string: pressureInchString)
+        attributedPressureInchString.addAttribute(NSAttributedStringKey
+            .font, value: UIFont(name: "Helvetica", size: 10) as Any, range: NSRange(
             location:6,
             length:4))
-        pressureLabel.attributedText = attributedPressureString
+        pressureInchLabel.attributedText = attributedPressureInchString
+
         
         // Visiblity is not well supported from OpenWeatherMap at this time. Not worth the trouble
         // visibilityLabel.text = "\(Int(weatherDataModel.visibility * METERS_TO_MILES))  miles"
@@ -322,8 +339,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         if segue.identifier == "ForecastSegue" {
             if let destinationVC = segue.destination as? ForecastViewController {
-                
-                destinationVC.location = params //locationDataModel.cityName
+//                print(weatherDataModel.latitude)
+                destinationVC.weatherDataModel = weatherDataModel
                 
             }
         }
@@ -348,7 +365,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     
     @IBAction func fahrCelsiusSwitch(_ sender: UISwitch) {
-
+        if fahrOrCelsiusSwitch.isOn {
+            weatherDataModel.fahrenheitOrCelcius = true
+        } else {
+            weatherDataModel.fahrenheitOrCelcius = false
+        }
         displayFahOrCelTemp()
     }
     

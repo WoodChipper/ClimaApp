@@ -16,11 +16,10 @@ items["two"] = "second"
 
 print(items)
 var newString = ""
-for (key, value) in items {
-    print("\(key) - \(value)")
-    newString = (key), (value)
-}
-
+//for (key, value) in items {
+//    print("\(key) - \(value)")
+//    newString = (key), (value)
+//}
 
 
 

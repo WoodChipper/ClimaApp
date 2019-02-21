@@ -30,11 +30,37 @@ class WeatherDataModel {
     var weatherIconName = ""  // 01n
                               // The time is set as a string value from the JSON conversion
     var timeOfReading = ""    // dt:  1517428200
+    var timeZone = ""
     var sunrise = ""          // 1517384353  -  we store the Time as string, as we do not do any futher calculations
     var sunset = ""           // 1517417375
     var mainDescription = ""  // Clear
     var subDescription = ""   // clear sky
     
+    var fahrenheitOrCelcius = true // True is Fahrenheit
+    
+    // JSON Temp conversion to Fahrenheit - ° F = 9/5(K - 273) + 32
+    func convertTemp(temp: Double, FahrOrCelc: Bool) -> Int {
+        if FahrOrCelc == true {
+            return Int(((temp - 273.15) * (9 / 5)) + 32)
+        } else {
+            return Int(temp - 273.15)
+        }
+    }
+    
+    // JSON Temp conversion to Fahrenheit - ° F = 9/5(K - 273) + 32
+    func convertFahrenheitTemp(temp: Double, FahrOrCelc: Bool) -> Int {
+        if FahrOrCelc == true {
+            return Int(temp)
+        } else {
+            return Int((temp - 32) * 0.5556)
+        }
+    }
+    
+    // JSON Temp conversion to Celcius conversion
+    func convertTempToCelcius(temp: Double) -> Int {
+        let celcius = Int(temp - 273.15)
+        return celcius
+    }
     
     // This method turns the wind direction degrees in symbol
     func windDirection(degrees: Int) -> String {

@@ -116,6 +116,15 @@ class ForecastViewController: UIViewController {
     @IBOutlet weak var wind6: UILabel!
     @IBOutlet weak var wind7: UILabel!
     
+    @IBOutlet weak var presMB0: UILabel!
+    @IBOutlet weak var presMB1: UILabel!
+    @IBOutlet weak var presMB3: UILabel!
+    @IBOutlet weak var presMB2: UILabel!
+    @IBOutlet weak var presMB4: UILabel!
+    @IBOutlet weak var presMB5: UILabel!
+    @IBOutlet weak var presMB6: UILabel!
+    @IBOutlet weak var presMB7: UILabel!
+    
     @IBOutlet weak var press0: UILabel!
     @IBOutlet weak var press1: UILabel!
     @IBOutlet weak var press2: UILabel!
@@ -208,7 +217,8 @@ class ForecastViewController: UIViewController {
                 self.humidity0.text = getHumidity(interval: interval + forecastDay)
                 self.cond0.text = getCond(interval: interval + forecastDay)
                 self.wind0.attributedText = getWind(interval: interval + forecastDay)
-                self.press0.text = getPressure(interval: interval + forecastDay)
+                self.presMB0.text = getPressure(interval: interval + forecastDay)
+                self.press0.text = getInchPressure(interval: interval + forecastDay)
                 self.rain0.text = getRain(interval: interval + forecastDay)
             case 1:
                 self.time1.attributedText = getTime(interval: interval + forecastDay)
@@ -218,7 +228,8 @@ class ForecastViewController: UIViewController {
                 self.humidity1.text = getHumidity(interval: interval + forecastDay)
                 self.cond1.text = getCond(interval: interval + forecastDay)
                 self.wind1.attributedText = getWind(interval: interval + forecastDay)
-                self.press1.text = getPressure(interval: interval + forecastDay)
+                self.presMB1.text = getPressure(interval: interval + forecastDay)
+                self.press1.text = getInchPressure(interval: interval + forecastDay)
                 self.rain1.text = getRain(interval: interval + forecastDay)
             case 2:
                 self.time2.attributedText = getTime(interval: interval + forecastDay)
@@ -228,7 +239,8 @@ class ForecastViewController: UIViewController {
                 self.humidity2.text = getHumidity(interval: interval + forecastDay)
                 self.cond2.text = getCond(interval: interval + forecastDay)
                 self.wind2.attributedText = getWind(interval: interval + forecastDay)
-                self.press2.text = getPressure(interval: interval + forecastDay)
+                self.presMB2.text = getPressure(interval: interval + forecastDay)
+                self.press2.text = getInchPressure(interval: interval + forecastDay)
                 self.rain2.text = getRain(interval: interval + forecastDay)
             case 3:
                 self.time3.attributedText = getTime(interval: interval + forecastDay)
@@ -238,7 +250,8 @@ class ForecastViewController: UIViewController {
                 self.humidity3.text = getHumidity(interval: interval + forecastDay)
                 self.cond3.text = getCond(interval: interval + forecastDay)
                 self.wind3.attributedText = getWind(interval: interval + forecastDay)
-                self.press3.text = getPressure(interval: interval + forecastDay)
+                self.presMB3.text = getPressure(interval: interval + forecastDay)
+                self.press3.text = getInchPressure(interval: interval + forecastDay)
                 self.rain3.text = getRain(interval: interval + forecastDay)
             case 4:
                 self.time4.attributedText = getTime(interval: interval + forecastDay)
@@ -248,7 +261,8 @@ class ForecastViewController: UIViewController {
                 self.humidity4.text = getHumidity(interval: interval + forecastDay)
                 self.cond4.text = getCond(interval: interval + forecastDay)
                 self.wind4.attributedText = getWind(interval: interval + forecastDay)
-                self.press4.text = getPressure(interval: interval + forecastDay)
+                self.presMB4.text = getPressure(interval: interval + forecastDay)
+                self.press4.text = getInchPressure(interval: interval + forecastDay)
                 self.rain4.text = getRain(interval: interval + forecastDay)
             case 5:
                 self.time5.attributedText = getTime(interval: interval + forecastDay)
@@ -258,7 +272,8 @@ class ForecastViewController: UIViewController {
                 self.humidity5.text = getHumidity(interval: interval + forecastDay)
                 self.cond5.text = getCond(interval: interval + forecastDay)
                 self.wind5.attributedText = getWind(interval: interval + forecastDay)
-                self.press5.text = getPressure(interval: interval + forecastDay)
+                self.presMB5.text = getPressure(interval: interval + forecastDay)
+                self.press5.text = getInchPressure(interval: interval + forecastDay)
                 self.rain5.text = getRain(interval: interval + forecastDay)
             case 6:
                 self.time6.attributedText = getTime(interval: interval + forecastDay)
@@ -268,7 +283,8 @@ class ForecastViewController: UIViewController {
                 self.humidity6.text = getHumidity(interval: interval + forecastDay)
                 self.cond6.text = getCond(interval: interval + forecastDay)
                 self.wind6.attributedText = getWind(interval: interval + forecastDay)
-                self.press6.text = getPressure(interval: interval + forecastDay)
+                self.presMB6.text = getPressure(interval: interval + forecastDay)
+                self.press6.text = getInchPressure(interval: interval + forecastDay)
                 self.rain6.text = getRain(interval: interval + forecastDay)
             case 7:
                 if forecastDay < 32 {
@@ -279,7 +295,8 @@ class ForecastViewController: UIViewController {
                     self.humidity7.text = getHumidity(interval: interval + forecastDay)
                     self.cond7.text = getCond(interval: interval + forecastDay)
                     self.wind7.attributedText = getWind(interval: interval + forecastDay)
-                    self.press7.text = getPressure(interval: interval + forecastDay)
+                    self.presMB7.text = getPressure(interval: interval + forecastDay)
+                    self.press7.text = getInchPressure(interval: interval + forecastDay)
                     self.rain7.text = getRain(interval: interval + forecastDay)
                 } else {
                     self.time7.text = "--"
@@ -340,6 +357,12 @@ class ForecastViewController: UIViewController {
     }
     
     func getPressure(interval: Int) -> String {
+        // basic pressure milliBars mB
+        let mB = (forecast?.list[interval].main.pressure)!
+        return String(Int(mB))
+    }
+    
+    func getInchPressure(interval: Int) -> String {
         // convert pressure from pHa to inHG
         let inHG = (forecast?.list[interval].main.pressure)! * PRESSURE_IPA_TO_INHG
         return String(format: "%.2f", inHG)
